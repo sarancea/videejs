@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="resources/js/videe.js"></script>
+</head>
+<body>
+<div id="videe-player"></div>
+<script language="JavaScript">
+    function getTokenFromUrl() {
+        var qs = window.location.toString().split("?")[1];
+        qs = qs.replace("token=", "");
+        return qs;
+    }
+
+    (function () {
+        var vd = new Videe(document.getElementById('videe-player'), getTokenFromUrl(), 'http://wp.dev');
+        vd.initWidget();
+
+    })();
+</script>
+</body>
+</html>

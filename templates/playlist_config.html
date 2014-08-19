@@ -1,0 +1,75 @@
+<div id="videe-error-message" class="error" style="display: none;"></div>
+<div id="videe-message" class="updated" style="display: none;"></div>
+<div id="videe-enable-message" class="error">You account is not enabled yet.</div>
+
+<div class="playlist-configuration-window">
+    <div class="left-side">
+        <div class="pcw-upper-line"></div>
+        <div class="pcw-upper-input">
+            <input type="text" name="search" id="search-field" value="" placeholder="Search"/>
+
+            <div class="looking-glass" id="search-action"></div>
+            <hr/>
+            <div class="row">
+                <span id="dynamic_export" name="export" value="dynamic" checked="checked" class="radio radio-export">
+                    <label>Dynamic export</label>
+                </span>
+                <span id="custom_export" name="export" value="custom" class="radio radio-export">
+                    <label>Custom export</label>
+                </span>
+            </div>
+            <div class="row">
+                <div class="left drop-down">
+                    <span class="left" init-value="All Categories"> All Categories</span>
+                    <ul id="videe-setting-category">
+                        [categoriesList[id:name]]
+                    </ul>
+                    <div class="right drop-down-arrow"></div>
+                </div>
+
+                <div class="left hr-vertical"></div>
+                <div class="left drop-down">
+                    <span class="left" init-value="All Languages"> All Languages</span>
+                    <ul id="videe-setting-language">
+                        [languagesList[id:name]]
+                    </ul>
+                    <div class="right drop-down-arrow"></div>
+                </div>
+            </div>
+        </div>
+        <ul class="video-list right" id="video-list">
+
+        </ul>
+        <div id="video-list-pagination" class="video-list-pagination right">
+
+        </div>
+        <div class="pcw-bottom-line"></div>
+        <br style="clear: both"/>
+    </div>
+    <div class="right-side">
+        <div class="export left" id="dynamic">
+            <h4>Stream videos from category</h4>
+            <br/>
+
+            <p>Just press the export button if you`d like your VIdee.tv to stream random videos from the content
+                category set on the left side of the window.</p>
+
+            <button class="big-button player_config">Export »</button>
+        </div>
+
+        <div class="export left" id="custom" style="display: none;">
+            <h4>Playlist</h4>
+            <br/>
+
+            <ul class="selected-video-list" id="selected-video-list">
+
+            </ul>
+            <div class="bottom-line">
+                <span id="videos_count">0</span> video | Duration <span id="video_duration" seconds="0">00:00:00</span>
+                <span class="delete_all" id="delete_all">Delete all selection</span></div>
+            <br style="clear: both"/>
+            <button class="big-button player_config">Next »</button>
+        </div>
+    </div>
+    <br style="clear: both"/>
+</div>

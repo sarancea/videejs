@@ -1,0 +1,51 @@
+<div id="videe-error-message" class="error" style="display: none;"></div>
+<div id="videe-message" class="updated" style="display: none;"></div>
+<div id="videe-enable-message" class="error">You account is not enabled yet.</div>
+
+<div class="videe-settings">
+    <div class="left-side">
+        <h4>Player settings</h4>
+
+        <div class="videe-settings-list">
+            <div class="row">
+                Autoplay video
+                <span class="right"><input type="checkbox" name="autoplay" id="autoplay"/></span>
+                <br style="clear: both"/>
+            </div>
+
+            <div class="row">
+                Show logo
+                <span class="right"><input type="checkbox" name="show_logo" id="show_logo"/></span>
+                <br style="clear: both"/>
+            </div>
+
+            <div class="row small">
+                Width
+                <span class="right"><input type="text" name="width" id="p_width"/></span>
+                <br style="clear: both"/>
+            </div>
+
+            <div class="row small">
+                Height
+                <span class="right"> <input type="text" name="height" id="p_height"/></span>
+                <br style="clear: both"/>
+            </div>
+            <div class="row">
+                <button class="big-button" id="generate_code">
+                    Generate Preview / Code
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="right-side">
+        <h4>Player preview</h4>
+
+        <div id="videe-player-preview"></div>
+        <div id="videe-player-preview-loader"></div>
+        <div class="embedded-code">
+            <h4>Embed code</h4>
+            <textarea id="embed-code"></textarea>
+        </div>
+    </div>
+    <br style="clear: both"/>
+</div>
