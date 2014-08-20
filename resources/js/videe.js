@@ -112,7 +112,7 @@ var Template = function () {
         } else if (event.target.parentNode
             && event.target.parentNode.parentNode
             && (!event.target.parentNode.parentNode.getAttribute('class')
-            || !event.target.parentNode.parentNode.getAttribute('class').match(/drop-down/))) {
+                || !event.target.parentNode.parentNode.getAttribute('class').match(/drop-down/))) {
             hide = true;
         }
 
@@ -413,12 +413,13 @@ var Videe = function (element, tokenKey, domain) {
          * CDN ROOT URL
          */
         var cdnUrl = 'http://209343044.r.cdnsun.net/';
-        var videoStaticUrl = 'http://video.cdnsun.net/593428229/593428229/';
+        var videoStaticUrl = 'rtmp://video.cdnsun.net/593428229/_definst_/mp4:593428229/';
 
         try {
             //temporary solution to get actual links to CDN
-            cdnUrl = 'http://' + JSON.parse(ajaxLoad('http://sit.vertamedia.com/api/domain/cdn')).items.static + '/';
-            videoStaticUrl = 'http://' + JSON.parse(ajaxLoad('http://sit.vertamedia.com/api/domain/cdn')).items.video + '/';
+            var cdnLinks = JSON.parse(ajaxLoad('http://sit.vertamedia.com/api/domain/cdn'));
+            cdnUrl = 'http://' + cdnLinks.items.static + '/';
+            //videoStaticUrl = 'rtmp://' + cdnLinks.items.video + '/';
         } catch (e) {
             cdnUrl = 'http://209343044.r.cdnsun.net/';
         }
@@ -733,8 +734,15 @@ var Videe = function (element, tokenKey, domain) {
         //Path to the templates folder
         var templatesDir = './templates/';
 
-        // JWPlayer API url
-        var jwPlayerApiUrl = 'http://jwpsrv.com/library/5V3tOP97EeK2SxIxOUCPzg.js';
+        // VideoJS urls
+        var videoJS = './resources/libs/video.js';
+        var videoJsAds = './resources/libs/videojs.ads.js';
+        var videoJsVastClient = './resources/libs/vast-client.js';
+        var videoJsVast = './resources/libs/videojs.vast.js';
+        var videoJsPlaylist = './resources/libs/videojs-playlist.js';
+
+        var videoJsCss = './resources/css/video-js.css';
+        var videoJsCssVast = './resources/css/videojs.vast.css';
 
         // Search indicator
         var searching = false;
@@ -779,7 +787,22 @@ var Videe = function (element, tokenKey, domain) {
                     return;
                 }
 
-                loadScript(jwPlayerApiUrl, loadWidget);
+                loadStylesheet(videoJsCss);
+                loadStylesheet(videoJsCssVast);
+
+                loadScript(videoJS, function () {
+                    loadScript(videoJsAds, function () {
+                        loadScript(videoJsVastClient, function () {
+                            loadScript(videoJsVast, function () {
+
+                                loadScript(videoJsPlaylist, loadWidget);
+                            });
+                        });
+                    });
+
+                }); //todo lode ViveoJS
+
+
             }
         };
 
@@ -813,6 +836,8 @@ var Videe = function (element, tokenKey, domain) {
 
         //Embed configured jwPlayer into
         function loadWidget() {
+
+            var videos = [];
             //Get size
             var size = pluginSettings['size'].toLowerCase().split('x');
             var height = 360;
@@ -825,7 +850,13 @@ var Videe = function (element, tokenKey, domain) {
                     width = size[1];
             }
 
-            var generatedPlayList = [];
+            if (parseInt(height) == height) {
+                height += 'px';
+            }
+
+            if (parseInt(width) == width) {
+                width += 'px';
+            }
 
             if (pluginSettings.cdnTag) {
                 //generate a playlist
@@ -838,34 +869,29 @@ var Videe = function (element, tokenKey, domain) {
                         if (!videosList.items.hasOwnProperty(i)) {
                             continue;
                         }
-                        var videoItem = videosList.items[i];
-                        generatedPlayList.push({
-                                sources: [
-                                    {
-                                        file: videoStaticUrl + 'pvideo/' + videoItem['mp4'] + '.smil'
-                                    }
-                                ],
-                                image: videoItemAbstract.imagePrefix + videoItem['image'],
-                                title: videoItem['title'],
-                                description: videoItem['description']
-                            }
-                        )
-                        ;
+                        var videoItem = videosList.items[i]; //todo VIDEOLIST GETS HERE
+                        videos.push({
+                            src: [cdnUrl + 'pvideo/' + videoItem['mp4']],
+                            poster: videoItemAbstract.imagePrefix + videoItem['image'],
+                            title: videoItem['title']
+                        });
                     }
                 }
-
             }
 
-            //initiate jwplayer
-            jwplayer(element).setup({
-                playlist: generatedPlayList,
-                height: height,
-                width: width,
-                autostart: pluginSettings.autoplay,
-                advertising: {
-                    client: 'vast',
-                    tag: pluginSettings.vastTag
-                }
+            var _element = element.parentNode;
+
+            _element.style.width = width;
+            _element.style.height = height;
+
+            videojs.options.flash.swf = "./resources/libs/video-js.swf";
+            var video = videojs(element.getAttribute("id"),{});
+            video.autoplay(pluginSettings.autoplay);
+            video.controls(true);
+            video.playList(videos);
+            video.ads();
+            video.vast({
+                url: pluginSettings.vastTag
             });
         }
 
@@ -928,6 +954,8 @@ var Videe = function (element, tokenKey, domain) {
             if (decodedConfigurationData.success && decodedConfigurationData.success == true) {
 
                 //store configuration
+                decodedConfigurationData.items.cdnTag = cdnSettingsPath + getToken() + '/playlist' + base64_encode(domain) + '.json';
+
                 pluginSettings.extend(decodedConfigurationData.items);
                 pluginSettings.autoplay = decodedConfigurationData.items['autoPlay'];
 
@@ -994,12 +1022,22 @@ var Videe = function (element, tokenKey, domain) {
 
         }
 
+        function loadStylesheet(uri) {
+            var style = document.createElement('link');
+            style.setAttribute('rel', 'stylesheet');
+            style.setAttribute('href', uri);
+
+            document.getElementsByTagName("head")[0].appendChild(style);
+        }
+
         /**
          * Load a script and run callback function
          * @param url
          * @param callback
          */
         function loadScript(url, callback) {
+            callback = callback || function () {
+            };
             var script = document.createElement("script");
             script.type = "text/javascript";
 
@@ -1415,8 +1453,8 @@ var Videe = function (element, tokenKey, domain) {
 
             searching = true;
             JsonP.send(service.searchVideosUrl + '?auth_token=' + getToken() + '&domain=' + domain
-                + '&query=' + encodeURI(query)
-                + '&limit=' + presets.pageLimit + '&start=' + (videoListPage * presets.pageLimit),
+                    + '&query=' + encodeURI(query)
+                    + '&limit=' + presets.pageLimit + '&start=' + (videoListPage * presets.pageLimit),
                 {
                     onSuccess: showVideos,
                     onTimeout: function () {
