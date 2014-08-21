@@ -871,7 +871,7 @@ var Videe = function (element, tokenKey, domain) {
                         }
                         var videoItem = videosList.items[i]; //todo VIDEOLIST GETS HERE
                         videos.push({
-                            src: [cdnUrl + 'pvideo/' + videoItem['mp4']],
+                            src: [cdnUrl + 'pvideo/' + videoItem['mp4'], cdnUrl + 'pvideo/' + videoItem['webm']],
                             poster: videoItemAbstract.imagePrefix + videoItem['image'],
                             title: videoItem['title']
                         });
