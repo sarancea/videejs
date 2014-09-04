@@ -13,6 +13,9 @@
 </video>
 
 <script language="JavaScript">
+    var parser = document.createElement('a');
+    parser.href = document.referrer;
+
     function getTokenFromUrl() {
         var qs = window.location.toString().split("?")[1];
         qs = qs.replace("token=", "");
@@ -20,7 +23,7 @@
     }
 
     (function () {
-        var vd = new Videe(document.getElementById('video-player'), getTokenFromUrl(), 'http://wp.dev');
+        var vd = new Videe(document.getElementById('video-player'), getTokenFromUrl(), parser.hostname);
         vd.initWidget();
 
     })();

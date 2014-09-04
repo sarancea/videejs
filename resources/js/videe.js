@@ -112,7 +112,7 @@ var Template = function () {
         } else if (event.target.parentNode
             && event.target.parentNode.parentNode
             && (!event.target.parentNode.parentNode.getAttribute('class')
-                || !event.target.parentNode.parentNode.getAttribute('class').match(/drop-down/))) {
+            || !event.target.parentNode.parentNode.getAttribute('class').match(/drop-down/))) {
             hide = true;
         }
 
@@ -618,8 +618,12 @@ var Videe = function (element, tokenKey, domain) {
                         document.getElementById('videe-player-preview-loader').removeAttribute('class');
                         document.getElementById('generate_code').removeAttribute('disabled');
 
-
-                        document.getElementById('embed-code').value = '<iframe src="' + presets.iframeUrl + '?token=' + getToken() + '"></iframe>';
+                        var size = pluginSettings.size.toLowerCase().split('x');
+                        if (size.length != 2) {
+                            size = ['100%', '100%'];
+                        }
+                        document.getElementById('embed-code').value = '<iframe scrolling="no" height="' + size[0] +
+                            '" width="' + size[1] + '"  src="' + presets.iframeUrl + '?token=' + getToken() + '"></iframe>';
                     },
                     onTimeout: function () {
                         document.getElementById('videe-player-preview-loader').removeAttribute('class');
@@ -768,7 +772,7 @@ var Videe = function (element, tokenKey, domain) {
         var presets = {
             registrationUrl: 'http://vertamedia.com/signup.html#publisher',
             passBackUrl: document.URL,
-            iframeUrl: 'http://localhost/~sarancea/VideeJS/iframe.html',
+            iframeUrl: document.location.protocol + '//' + document.location.host + document.location.pathname.split('/').slice(0, -1).join('/') + '/iframe.html',
             skinsList: ['six', 'beelden', 'bekle', 'five', 'glow', 'roundster', 'stormtrooper', 'vapor'],
             languagesList: [],
             categoriesList: [],
@@ -858,26 +862,25 @@ var Videe = function (element, tokenKey, domain) {
                 width += 'px';
             }
 
-            if (pluginSettings.cdnTag) {
-                //generate a playlist
-                var playlistData = ajaxLoad(cdnSettingsPath + getToken() + '/playlist' + base64_encode(domain) + '.json');
+            //generate a playlist
+            var playlistData = ajaxLoad(cdnSettingsPath + getToken() + '/playlist' + base64_encode(domain) + '.json');
 
-                var videosList = JSON.parse(playlistData);
+            var videosList = JSON.parse(playlistData);
 
-                if (videosList.success == true && videosList.items) {
-                    for (var i in videosList.items) {
-                        if (!videosList.items.hasOwnProperty(i)) {
-                            continue;
-                        }
-                        var videoItem = videosList.items[i]; //todo VIDEOLIST GETS HERE
-                        videos.push({
-                            src: [cdnUrl + 'pvideo/' + videoItem['mp4'], cdnUrl + 'pvideo/' + videoItem['webm']],
-                            poster: videoItemAbstract.imagePrefix + videoItem['image'],
-                            title: videoItem['title']
-                        });
+            if (videosList.success == true && videosList.items) {
+                for (var i in videosList.items) {
+                    if (!videosList.items.hasOwnProperty(i)) {
+                        continue;
                     }
+                    var videoItem = videosList.items[i]; //todo VIDEOLIST GETS HERE
+                    videos.push({
+                        src: [cdnUrl + 'pvideo/' + videoItem['mp4'], cdnUrl + 'pvideo/' + videoItem['webm']],
+                        poster: videoItemAbstract.imagePrefix + videoItem['image'],
+                        title: videoItem['title']
+                    });
                 }
             }
+
 
             var _element = element.parentNode;
 
@@ -885,7 +888,7 @@ var Videe = function (element, tokenKey, domain) {
             _element.style.height = height;
 
             videojs.options.flash.swf = "./resources/libs/video-js.swf";
-            var video = videojs(element.getAttribute("id"),{});
+            var video = videojs(element.getAttribute("id"), {});
             video.autoplay(pluginSettings.autoplay);
             video.controls(true);
             video.playList(videos);
@@ -1453,8 +1456,8 @@ var Videe = function (element, tokenKey, domain) {
 
             searching = true;
             JsonP.send(service.searchVideosUrl + '?auth_token=' + getToken() + '&domain=' + domain
-                    + '&query=' + encodeURI(query)
-                    + '&limit=' + presets.pageLimit + '&start=' + (videoListPage * presets.pageLimit),
+                + '&query=' + encodeURI(query)
+                + '&limit=' + presets.pageLimit + '&start=' + (videoListPage * presets.pageLimit),
                 {
                     onSuccess: showVideos,
                     onTimeout: function () {
