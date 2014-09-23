@@ -7,10 +7,13 @@
 
 </head>
 <body>
-<video id="video-player" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{}'>
-    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a
-            href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+
+<video id="video-player" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{}'
+       style="background-color:rgba(0,0,0,0.0);">
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that
+        <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
 </video>
+
 
 <script language="JavaScript">
     var parser = document.createElement('a');
@@ -23,9 +26,8 @@
     }
 
     (function () {
-        var vd = new Videe(document.getElementById('video-player'), getTokenFromUrl(), parser.hostname);
+        var vd = new Videe(document.getElementById('video-player'), getTokenFromUrl(), 'wp.dev');//parser.hostname);
         vd.initWidget();
-
     })();
 </script>
 </body>

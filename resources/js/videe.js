@@ -12,7 +12,7 @@ var isElement = function (a) {
     try {
         return a.nodeName ? !0 : !1
     } catch (b) {
-        return!1
+        return !1
     }
 };
 
@@ -371,9 +371,9 @@ var JsonP = (function () {
     that.send = function (src, options) {
         var callback_name = options.callbackName || 'jsonP' + Date.now(),
             on_success = options.onSuccess || function () {
-            },
+                },
             on_timeout = options.onTimeout || function () {
-            },
+                },
             timeout = options.timeout || 60; // sec
 
         var timeout_trigger = window.setTimeout(function () {
@@ -623,7 +623,7 @@ var Videe = function (element, tokenKey, domain) {
                             size = ['100%', '100%'];
                         }
                         document.getElementById('embed-code').value = '<iframe scrolling="no" height="' + size[0] +
-                            '" width="' + size[1] + '"  src="' + presets.iframeUrl + '?token=' + getToken() + '"></iframe>';
+                        '" width="' + size[1] + '"  src="' + presets.iframeUrl + '?token=' + getToken() + '"></iframe>';
                     },
                     onTimeout: function () {
                         document.getElementById('videe-player-preview-loader').removeAttribute('class');
