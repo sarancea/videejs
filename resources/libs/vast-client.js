@@ -32,59 +32,51 @@
     })({
         1: [
             function(_dereq_, module, exports) {
-                // Copyright Joyent, Inc. and other Node contributors.
-                //
-                // Permission is hereby granted, free of charge, to any person obtaining a
-                // copy of this software and associated documentation files (the
-                // "Software"), to deal in the Software without restriction, including
-                // without limitation the rights to use, copy, modify, merge, publish,
-                // distribute, sublicense, and/or sell copies of the Software, and to permit
-                // persons to whom the Software is furnished to do so, subject to the
-                // following conditions:
-                //
-                // The above copyright notice and this permission notice shall be included
-                // in all copies or substantial portions of the Software.
-                //
-                // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-                // OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-                // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-                // NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-                // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-                // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-                // USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
                 function EventEmitter() {
                     this._events = this._events || {};
                     this._maxListeners = this._maxListeners || undefined;
                 }
                 module.exports = EventEmitter;
-
-                // Backwards-compat with node 0.10.x
+// Backwards-compat with node 0.10.x
                 EventEmitter.EventEmitter = EventEmitter;
-
                 EventEmitter.prototype._events = undefined;
                 EventEmitter.prototype._maxListeners = undefined;
-
-                // By default EventEmitters will print a warning if more than 10 listeners are
-                // added to it. This is a useful default which helps finding memory leaks.
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
                 EventEmitter.defaultMaxListeners = 10;
-
-                // Obviously not all Emitters should be limited to 10. This function allows
-                // that to be increased. Set to zero for unlimited.
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
                 EventEmitter.prototype.setMaxListeners = function(n) {
                     if (!isNumber(n) || n < 0 || isNaN(n))
                         throw TypeError('n must be a positive number');
                     this._maxListeners = n;
                     return this;
                 };
-
                 EventEmitter.prototype.emit = function(type) {
                     var er, handler, len, args, i, listeners;
-
                     if (!this._events)
                         this._events = {};
-
-                    // If there is no 'error' event listener then throw.
+// If there is no 'error' event listener then throw.
                     if (type === 'error') {
                         if (!this._events.error ||
                             (isObject(this._events.error) && !this._events.error.length)) {
@@ -97,15 +89,12 @@
                             return false;
                         }
                     }
-
                     handler = this._events[type];
-
                     if (isUndefined(handler))
                         return false;
-
                     if (isFunction(handler)) {
                         switch (arguments.length) {
-                            // fast cases
+// fast cases
                             case 1:
                                 handler.call(this);
                                 break;
@@ -115,7 +104,7 @@
                             case 3:
                                 handler.call(this, arguments[1], arguments[2]);
                                 break;
-                                // slower
+// slower
                             default:
                                 len = arguments.length;
                                 args = new Array(len - 1);
@@ -128,43 +117,35 @@
                         args = new Array(len - 1);
                         for (i = 1; i < len; i++)
                             args[i - 1] = arguments[i];
-
                         listeners = handler.slice();
                         len = listeners.length;
                         for (i = 0; i < len; i++)
                             listeners[i].apply(this, args);
                     }
-
                     return true;
                 };
-
                 EventEmitter.prototype.addListener = function(type, listener) {
                     var m;
-
                     if (!isFunction(listener))
                         throw TypeError('listener must be a function');
-
                     if (!this._events)
                         this._events = {};
-
-                    // To avoid recursion in the case that type === "newListener"! Before
-                    // adding it to the listeners, first emit "newListener".
+// To avoid recursion in the case that type === "newListener"! Before
+// adding it to the listeners, first emit "newListener".
                     if (this._events.newListener)
                         this.emit('newListener', type,
                             isFunction(listener.listener) ?
-                            listener.listener : listener);
-
+                                listener.listener : listener);
                     if (!this._events[type])
-                    // Optimize the case of one listener. Don't need the extra array object.
+// Optimize the case of one listener. Don't need the extra array object.
                         this._events[type] = listener;
                     else if (isObject(this._events[type]))
-                    // If we've already got an array, just append.
+// If we've already got an array, just append.
                         this._events[type].push(listener);
                     else
-                    // Adding the second element, need to change to array.
+// Adding the second element, need to change to array.
                         this._events[type] = [this._events[type], listener];
-
-                    // Check for listener leak
+// Check for listener leak
                     if (isObject(this._events[type]) && !this._events[type].warned) {
                         var m;
                         if (!isUndefined(this._maxListeners)) {
@@ -172,7 +153,6 @@
                         } else {
                             m = EventEmitter.defaultMaxListeners;
                         }
-
                         if (m && m > 0 && this._events[type].length > m) {
                             this._events[type].warned = true;
                             console.error('(node) warning: possible EventEmitter memory ' +
@@ -182,53 +162,39 @@
                             console.trace();
                         }
                     }
-
                     return this;
                 };
-
                 EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
                 EventEmitter.prototype.once = function(type, listener) {
                     if (!isFunction(listener))
                         throw TypeError('listener must be a function');
-
                     var fired = false;
-
                     function g() {
                         this.removeListener(type, g);
-
                         if (!fired) {
                             fired = true;
                             listener.apply(this, arguments);
                         }
                     }
-
                     g.listener = listener;
                     this.on(type, g);
-
                     return this;
                 };
-
-                // emits a 'removeListener' event iff the listener was removed
+// emits a 'removeListener' event iff the listener was removed
                 EventEmitter.prototype.removeListener = function(type, listener) {
                     var list, position, length, i;
-
                     if (!isFunction(listener))
                         throw TypeError('listener must be a function');
-
                     if (!this._events || !this._events[type])
                         return this;
-
                     list = this._events[type];
                     length = list.length;
                     position = -1;
-
                     if (list === listener ||
                         (isFunction(list.listener) && list.listener === listener)) {
                         delete this._events[type];
                         if (this._events.removeListener)
                             this.emit('removeListener', type, listener);
-
                     } else if (isObject(list)) {
                         for (i = length; i-- > 0;) {
                             if (list[i] === listener ||
@@ -237,31 +203,24 @@
                                 break;
                             }
                         }
-
                         if (position < 0)
                             return this;
-
                         if (list.length === 1) {
                             list.length = 0;
                             delete this._events[type];
                         } else {
                             list.splice(position, 1);
                         }
-
                         if (this._events.removeListener)
                             this.emit('removeListener', type, listener);
                     }
-
                     return this;
                 };
-
                 EventEmitter.prototype.removeAllListeners = function(type) {
                     var key, listeners;
-
                     if (!this._events)
                         return this;
-
-                    // not listening for removeListener, no need to emit
+// not listening for removeListener, no need to emit
                     if (!this._events.removeListener) {
                         if (arguments.length === 0)
                             this._events = {};
@@ -269,8 +228,7 @@
                             delete this._events[type];
                         return this;
                     }
-
-                    // emit removeListener for all listeners on all events
+// emit removeListener for all listeners on all events
                     if (arguments.length === 0) {
                         for (key in this._events) {
                             if (key === 'removeListener') continue;
@@ -280,21 +238,17 @@
                         this._events = {};
                         return this;
                     }
-
                     listeners = this._events[type];
-
                     if (isFunction(listeners)) {
                         this.removeListener(type, listeners);
                     } else {
-                        // LIFO order
+// LIFO order
                         while (listeners.length)
                             this.removeListener(type, listeners[listeners.length - 1]);
                     }
                     delete this._events[type];
-
                     return this;
                 };
-
                 EventEmitter.prototype.listeners = function(type) {
                     var ret;
                     if (!this._events || !this._events[type])
@@ -305,7 +259,6 @@
                         ret = this._events[type].slice();
                     return ret;
                 };
-
                 EventEmitter.listenerCount = function(emitter, type) {
                     var ret;
                     if (!emitter._events || !emitter._events[type])
@@ -316,63 +269,46 @@
                         ret = emitter._events[type].length;
                     return ret;
                 };
-
                 function isFunction(arg) {
                     return typeof arg === 'function';
                 }
-
                 function isNumber(arg) {
                     return typeof arg === 'number';
                 }
-
                 function isObject(arg) {
                     return typeof arg === 'object' && arg !== null;
                 }
-
                 function isUndefined(arg) {
                     return arg === void 0;
                 }
-
             }, {}
         ],
         2: [
             function(_dereq_, module, exports) {
-                // Generated by CoffeeScript 1.7.1
+// Generated by CoffeeScript 1.7.1
                 var VASTAd;
-
                 VASTAd = (function() {
                     function VASTAd() {
                         this.errorURLTemplates = [];
                         this.impressionURLTemplates = [];
                         this.creatives = [];
                     }
-
                     return VASTAd;
-
                 })();
-
                 module.exports = VASTAd;
-
             }, {}
         ],
         3: [
             function(_dereq_, module, exports) {
-                // Generated by CoffeeScript 1.7.1
+// Generated by CoffeeScript 1.7.1
                 var VASTClient, VASTParser, VASTUtil;
-
                 VASTParser = _dereq_('./parser.coffee');
-
                 VASTUtil = _dereq_('./util.coffee');
-
                 VASTClient = (function() {
                     function VASTClient() {}
-
                     VASTClient.cappingFreeLunch = 0;
-
                     VASTClient.cappingMinimumTimeInterval = 0;
-
                     VASTClient.timeout = 0;
-
                     VASTClient.get = function(url, cb) {
                         var now;
                         now = +new Date();
@@ -396,7 +332,6 @@
                             };
                         })(this));
                     };
-
                     (function() {
                         var defineProperty, storage;
                         storage = VASTUtil.storage;
@@ -420,13 +355,9 @@
                             VASTClient.totalCallsTimeout = 0;
                         }
                     })();
-
                     return VASTClient;
-
                 })();
-
                 module.exports = VASTClient;
-
             }, {
                 "./parser.coffee": 8,
                 "./util.coffee": 14
@@ -434,9 +365,8 @@
         ],
         4: [
             function(_dereq_, module, exports) {
-                // Generated by CoffeeScript 1.7.1
+// Generated by CoffeeScript 1.7.1
                 var VASTCompanionAd;
-
                 VASTCompanionAd = (function() {
                     function VASTCompanionAd() {
                         this.id = null;
@@ -447,25 +377,20 @@
                         this.companionClickThroughURLTemplate = null;
                         this.trackingEvents = {};
                     }
-
                     return VASTCompanionAd;
-
                 })();
-
                 module.exports = VASTCompanionAd;
-
             }, {}
         ],
         5: [
             function(_dereq_, module, exports) {
-                // Generated by CoffeeScript 1.7.1
+// Generated by CoffeeScript 1.7.1
                 var VASTCreative, VASTCreativeCompanion, VASTCreativeLinear, VASTCreativeNonLinear,
                     __hasProp = {}.hasOwnProperty,
                     __extends = function(child, parent) {
                         for (var key in parent) {
                             if (__hasProp.call(parent, key)) child[key] = parent[key];
                         }
-
                         function ctor() {
                             this.constructor = child;
                         }
@@ -474,19 +399,14 @@
                         child.__super__ = parent.prototype;
                         return child;
                     };
-
                 VASTCreative = (function() {
                     function VASTCreative() {
                         this.trackingEvents = {};
                     }
-
                     return VASTCreative;
-
                 })();
-
                 VASTCreativeLinear = (function(_super) {
                     __extends(VASTCreativeLinear, _super);
-
                     function VASTCreativeLinear() {
                         VASTCreativeLinear.__super__.constructor.apply(this, arguments);
                         this.type = "linear";
@@ -496,50 +416,38 @@
                         this.videoClickThroughURLTemplate = null;
                         this.videoClickTrackingURLTemplate = null;
                     }
-
                     return VASTCreativeLinear;
-
                 })(VASTCreative);
-
                 VASTCreativeNonLinear = (function(_super) {
                     __extends(VASTCreativeNonLinear, _super);
-
                     function VASTCreativeNonLinear() {
                         return VASTCreativeNonLinear.__super__.constructor.apply(this, arguments);
                     }
-
                     return VASTCreativeNonLinear;
-
                 })(VASTCreative);
-
                 VASTCreativeCompanion = (function() {
                     function VASTCreativeCompanion() {
                         this.type = "companion";
                         this.variations = [];
                     }
-
                     return VASTCreativeCompanion;
-
                 })();
-
                 module.exports = {
                     VASTCreativeLinear: VASTCreativeLinear,
                     VASTCreativeNonLinear: VASTCreativeNonLinear,
                     VASTCreativeCompanion: VASTCreativeCompanion
                 };
-
             }, {}
         ],
         6: [
             function(_dereq_, module, exports) {
-                // Generated by CoffeeScript 1.7.1
+// Generated by CoffeeScript 1.7.1
                 module.exports = {
                     client: _dereq_('./client.coffee'),
                     tracker: _dereq_('./tracker.coffee'),
                     parser: _dereq_('./parser.coffee'),
                     util: _dereq_('./util.coffee')
                 };
-
             }, {
                 "./client.coffee": 3,
                 "./parser.coffee": 8,
@@ -549,9 +457,8 @@
         ],
         7: [
             function(_dereq_, module, exports) {
-                // Generated by CoffeeScript 1.7.1
+// Generated by CoffeeScript 1.7.1
                 var VASTMediaFile;
-
                 VASTMediaFile = (function() {
                     function VASTMediaFile() {
                         this.fileURL = null;
@@ -564,73 +471,52 @@
                         this.width = 0;
                         this.height = 0;
                     }
-
                     return VASTMediaFile;
-
                 })();
-
                 module.exports = VASTMediaFile;
-
             }, {}
         ],
         8: [
             function(_dereq_, module, exports) {
-                // Generated by CoffeeScript 1.7.1
+// Generated by CoffeeScript 1.7.1
                 var URLHandler, VASTAd, VASTCompanionAd, VASTCreativeCompanion, VASTCreativeLinear, VASTMediaFile, VASTParser, VASTResponse, VASTUtil,
                     __indexOf = [].indexOf || function(item) {
-                        for (var i = 0, l = this.length; i < l; i++) {
-                            if (i in this && this[i] === item) return i;
-                        }
-                        return -1;
-                    };
-
+                            for (var i = 0, l = this.length; i < l; i++) {
+                                if (i in this && this[i] === item) return i;
+                            }
+                            return -1;
+                        };
                 URLHandler = _dereq_('./urlhandler.coffee');
-
                 VASTResponse = _dereq_('./response.coffee');
-
                 VASTAd = _dereq_('./ad.coffee');
-
                 VASTUtil = _dereq_('./util.coffee');
-
                 VASTCreativeLinear = _dereq_('./creative.coffee').VASTCreativeLinear;
-
                 VASTCreativeCompanion = _dereq_('./creative.coffee').VASTCreativeCompanion;
-
                 VASTMediaFile = _dereq_('./mediafile.coffee');
-
                 VASTCompanionAd = _dereq_('./companionad.coffee');
-
                 VASTParser = (function() {
                     var URLTemplateFilters;
-
                     function VASTParser() {}
-
                     URLTemplateFilters = [];
-
                     VASTParser.addURLTemplateFilter = function(func) {
                         if (typeof func === 'function') {
                             URLTemplateFilters.push(func);
                         }
                     };
-
                     VASTParser.removeURLTemplateFilter = function() {
                         return URLTemplateFilters.pop();
                     };
-
                     VASTParser.countURLTemplateFilters = function() {
                         return URLTemplateFilters.length;
                     };
-
                     VASTParser.clearUrlTemplateFilters = function() {
                         return URLTemplateFilters = [];
                     };
-
                     VASTParser.parse = function(url, cb) {
                         return this._parse(url, null, function(err, response) {
                             return cb(response);
                         });
                     };
-
                     VASTParser._parse = function(url, parentURLs, cb) {
                         var filter, _i, _len;
                         for (_i = 0, _len = URLTemplateFilters.length; _i < _len; _i++) {
@@ -757,7 +643,6 @@
                             };
                         })(this));
                     };
-
                     VASTParser.childByName = function(node, name) {
                         var child, _i, _len, _ref;
                         _ref = node.childNodes;
@@ -768,7 +653,6 @@
                             }
                         }
                     };
-
                     VASTParser.childsByName = function(node, name) {
                         var child, childs, _i, _len, _ref;
                         childs = [];
@@ -781,7 +665,6 @@
                         }
                         return childs;
                     };
-
                     VASTParser.parseAdElement = function(adElement) {
                         var adTypeElement, _i, _len, _ref;
                         _ref = adElement.childNodes;
@@ -794,7 +677,6 @@
                             }
                         }
                     };
-
                     VASTParser.parseWrapperElement = function(wrapperElement) {
                         var ad, wrapperCreativeElement, wrapperURLElement;
                         ad = this.parseInLineElement(wrapperElement);
@@ -810,7 +692,6 @@
                             return ad;
                         }
                     };
-
                     VASTParser.parseInLineElement = function(inLineElement) {
                         var ad, creative, creativeElement, creativeTypeElement, node, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
                         ad = new VASTAd();
@@ -850,7 +731,6 @@
                         }
                         return ad;
                     };
-
                     VASTParser.parseCreativeLinearElement = function(creativeElement) {
                         var creative, eventName, mediaFile, mediaFileElement, mediaFilesElement, percent, skipOffset, trackingElement, trackingEventsElement, trackingURLTemplate, videoClicksElement, _base, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3;
                         creative = new VASTCreativeLinear();
@@ -909,7 +789,6 @@
                         }
                         return creative;
                     };
-
                     VASTParser.parseCompanionAd = function(creativeElement) {
                         var companionAd, companionResource, creative, eventName, staticElement, trackingElement, trackingEventsElement, trackingURLTemplate, _base, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3;
                         creative = new VASTCreativeCompanion();
@@ -947,7 +826,6 @@
                         }
                         return creative;
                     };
-
                     VASTParser.parseDuration = function(durationString) {
                         var durationComponents, hours, minutes, seconds, secondsAndMS;
                         if (!(durationString != null)) {
@@ -969,17 +847,12 @@
                         }
                         return hours + minutes + seconds;
                     };
-
                     VASTParser.parseNodeText = function(node) {
                         return node && (node.textContent || node.text);
                     };
-
                     return VASTParser;
-
                 })();
-
                 module.exports = VASTParser;
-
             }, {
                 "./ad.coffee": 2,
                 "./companionad.coffee": 4,
@@ -992,33 +865,27 @@
         ],
         9: [
             function(_dereq_, module, exports) {
-                // Generated by CoffeeScript 1.7.1
+// Generated by CoffeeScript 1.7.1
                 var VASTResponse;
-
                 VASTResponse = (function() {
                     function VASTResponse() {
                         this.ads = [];
                         this.errorURLTemplates = [];
                     }
-
                     return VASTResponse;
-
                 })();
-
                 module.exports = VASTResponse;
-
             }, {}
         ],
         10: [
             function(_dereq_, module, exports) {
-                // Generated by CoffeeScript 1.7.1
+// Generated by CoffeeScript 1.7.1
                 var EventEmitter, VASTClient, VASTCreativeLinear, VASTTracker, VASTUtil,
                     __hasProp = {}.hasOwnProperty,
                     __extends = function(child, parent) {
                         for (var key in parent) {
                             if (__hasProp.call(parent, key)) child[key] = parent[key];
                         }
-
                         function ctor() {
                             this.constructor = child;
                         }
@@ -1027,18 +894,12 @@
                         child.__super__ = parent.prototype;
                         return child;
                     };
-
                 VASTClient = _dereq_('./client.coffee');
-
                 VASTUtil = _dereq_('./util.coffee');
-
                 VASTCreativeLinear = _dereq_('./creative.coffee').VASTCreativeLinear;
-
                 EventEmitter = _dereq_('events').EventEmitter;
-
                 VASTTracker = (function(_super) {
                     __extends(VASTTracker, _super);
-
                     function VASTTracker(ad, creative) {
                         var eventName, events, _ref;
                         this.ad = ad;
@@ -1073,7 +934,6 @@
                             VASTClient.lastSuccessfullAd = +new Date();
                         });
                     }
-
                     VASTTracker.prototype.setProgress = function(progress) {
                         var eventName, events, percent, quartile, skipDelay, time, _i, _len, _ref;
                         skipDelay = this.skipDelay === null ? this.skipDelayDefault : this.skipDelay;
@@ -1109,34 +969,29 @@
                         }
                         return this.progress = progress;
                     };
-
                     VASTTracker.prototype.setMuted = function(muted) {
                         if (this.muted !== muted) {
                             this.track(muted ? "muted" : "unmuted");
                         }
                         return this.muted = muted;
                     };
-
                     VASTTracker.prototype.setPaused = function(paused) {
                         if (this.paused !== paused) {
                             this.track(paused ? "pause" : "resume");
                         }
                         return this.paused = paused;
                     };
-
                     VASTTracker.prototype.setFullscreen = function(fullscreen) {
                         if (this.fullscreen !== fullscreen) {
                             this.track(fullscreen ? "fullscreen" : "exitFullscreen");
                         }
                         return this.fullscreen = fullscreen;
                     };
-
                     VASTTracker.prototype.setSkipDelay = function(duration) {
                         if (typeof duration === 'number') {
                             return this.skipDelay = duration;
                         }
                     };
-
                     VASTTracker.prototype.load = function() {
                         if (!this.impressed) {
                             this.impressed = true;
@@ -1144,26 +999,21 @@
                             return this.track("creativeView");
                         }
                     };
-
                     VASTTracker.prototype.errorWithCode = function(errorCode) {
                         return this.trackURLs(this.ad.errorURLTemplates, {
                             ERRORCODE: errorCode
                         });
                     };
-
                     VASTTracker.prototype.complete = function() {
                         return this.track("complete");
                     };
-
                     VASTTracker.prototype.stop = function() {
                         return this.track(this.linear ? "closeLinear" : "close");
                     };
-
                     VASTTracker.prototype.skip = function() {
                         this.track("skip");
                         return this.trackingEvents = [];
                     };
-
                     VASTTracker.prototype.click = function() {
                         var clickThroughURL, variables;
                         if (this.clickTrackingURLTemplate != null) {
@@ -1179,7 +1029,6 @@
                             return this.emit("clickthrough", clickThroughURL);
                         }
                     };
-
                     VASTTracker.prototype.track = function(eventName, once) {
                         var idx, trackingURLTemplates;
                         if (once == null) {
@@ -1203,7 +1052,6 @@
                             }
                         }
                     };
-
                     VASTTracker.prototype.trackURLs = function(URLTemplates, variables) {
                         if (variables == null) {
                             variables = {};
@@ -1213,7 +1061,6 @@
                         }
                         return VASTUtil.track(URLTemplates, variables);
                     };
-
                     VASTTracker.prototype.progressFormated = function() {
                         var h, m, ms, s, seconds;
                         seconds = parseInt(this.progress);
@@ -1232,13 +1079,9 @@
                         ms = parseInt((this.progress - seconds) * 100);
                         return "" + h + ":" + m + ":" + s + "." + ms;
                     };
-
                     return VASTTracker;
-
                 })(EventEmitter);
-
                 module.exports = VASTTracker;
-
             }, {
                 "./client.coffee": 3,
                 "./creative.coffee": 5,
@@ -1248,16 +1091,12 @@
         ],
         11: [
             function(_dereq_, module, exports) {
-                // Generated by CoffeeScript 1.7.1
+// Generated by CoffeeScript 1.7.1
                 var URLHandler, flash, xhr;
-
                 xhr = _dereq_('./urlhandlers/xmlhttprequest.coffee');
-
                 flash = _dereq_('./urlhandlers/flash.coffee');
-
                 URLHandler = (function() {
                     function URLHandler() {}
-
                     URLHandler.get = function(url, cb) {
                         if (typeof window === "undefined" || window === null) {
                             return _dereq_('./urlhandlers/' + 'node.coffee').get(url, cb);
@@ -1269,13 +1108,9 @@
                             return cb();
                         }
                     };
-
                     return URLHandler;
-
                 })();
-
                 module.exports = URLHandler;
-
             }, {
                 "./urlhandlers/flash.coffee": 12,
                 "./urlhandlers/xmlhttprequest.coffee": 13
@@ -1283,12 +1118,10 @@
         ],
         12: [
             function(_dereq_, module, exports) {
-                // Generated by CoffeeScript 1.7.1
+// Generated by CoffeeScript 1.7.1
                 var FlashURLHandler;
-
                 FlashURLHandler = (function() {
                     function FlashURLHandler() {}
-
                     FlashURLHandler.xdr = function() {
                         var xdr;
                         if (window.XDomainRequest) {
@@ -1296,11 +1129,9 @@
                         }
                         return xdr;
                     };
-
                     FlashURLHandler.supported = function() {
                         return !!this.xdr();
                     };
-
                     FlashURLHandler.get = function(url, cb) {
                         var xdr, xmlDocument;
                         if (xmlDocument = typeof window.ActiveXObject === "function" ? new window.ActiveXObject("Microsoft.XMLDOM") : void 0) {
@@ -1316,23 +1147,17 @@
                             return cb(null, xmlDocument);
                         };
                     };
-
                     return FlashURLHandler;
-
                 })();
-
                 module.exports = FlashURLHandler;
-
             }, {}
         ],
         13: [
             function(_dereq_, module, exports) {
-                // Generated by CoffeeScript 1.7.1
+// Generated by CoffeeScript 1.7.1
                 var XHRURLHandler;
-
                 XHRURLHandler = (function() {
                     function XHRURLHandler() {}
-
                     XHRURLHandler.xhr = function() {
                         var xhr;
                         xhr = new window.XMLHttpRequest();
@@ -1340,11 +1165,9 @@
                             return xhr;
                         }
                     };
-
                     XHRURLHandler.supported = function() {
                         return !!this.xhr();
                     };
-
                     XHRURLHandler.get = function(url, cb) {
                         var xhr;
                         xhr = this.xhr();
@@ -1356,23 +1179,17 @@
                             }
                         };
                     };
-
                     return XHRURLHandler;
-
                 })();
-
                 module.exports = XHRURLHandler;
-
             }, {}
         ],
         14: [
             function(_dereq_, module, exports) {
-                // Generated by CoffeeScript 1.7.1
+// Generated by CoffeeScript 1.7.1
                 var VASTUtil;
-
                 VASTUtil = (function() {
                     function VASTUtil() {}
-
                     VASTUtil.track = function(URLTemplates, variables) {
                         var URL, URLs, i, _i, _len, _results;
                         URLs = this.resolveURLTemplates(URLTemplates, variables);
@@ -1383,12 +1200,10 @@
                                 i = new Image();
                                 _results.push(i.src = URL);
                             } else {
-
                             }
                         }
                         return _results;
                     };
-
                     VASTUtil.resolveURLTemplates = function(URLTemplates, variables) {
                         var URLTemplate, URLs, key, macro1, macro2, resolveURL, value, _i, _len;
                         URLs = [];
@@ -1413,7 +1228,6 @@
                         }
                         return URLs;
                     };
-
                     VASTUtil.storage = (function() {
                         var data, isDisabled, storage, storageError;
                         try {
@@ -1459,13 +1273,9 @@
                         }
                         return storage;
                     })();
-
                     return VASTUtil;
-
                 })();
-
                 module.exports = VASTUtil;
-
             }, {}
         ]
     }, {}, [6])

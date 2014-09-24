@@ -403,6 +403,9 @@ var JsonP = (function () {
  */
 var Videe = function (element, tokenKey, domain) {
 
+        //Check OS is MacLike
+        var isMacLike = navigator.platform.match(/(Mac|iPhone|iPod|iPad)/i);
+        var isIOS = navigator.platform.match(/(iPhone|iPod|iPad)/i);
 
         /**
          * Last search query string
@@ -873,8 +876,14 @@ var Videe = function (element, tokenKey, domain) {
                         continue;
                     }
                     var videoItem = videosList.items[i]; //todo VIDEOLIST GETS HERE
+                    var videoContainer = [cdnUrl + 'pvideo/' + videoItem['mp4']];
+
+                    if (!isMacLike && !isIOS) {
+                        videoContainer.push(cdnUrl + 'pvideo/' + videoItem['webm']);
+                    }
+
                     videos.push({
-                        src: [cdnUrl + 'pvideo/' + videoItem['mp4'], cdnUrl + 'pvideo/' + videoItem['webm']],
+                        src: videoContainer,
                         poster: videoItemAbstract.imagePrefix + videoItem['image'],
                         title: videoItem['title']
                     });
