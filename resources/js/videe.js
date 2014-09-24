@@ -1422,14 +1422,14 @@ var Videe = function (element, tokenKey, domain) {
                 }
 
                 if (!searchField.value || searchField.value.length <= 0) {
-                    if (console) console.log('Empty value received: ' + searchField.getAttribute('value'));
+                    if (console) console.log('Empty value received: ' + searchField.value);
                     return false;
                 }
 
                 //clear video list areas
                 document.getElementById('video-list').innerHTML = '';
 
-                loadVideosFromSearch(0, searchField.getAttribute('value'));
+                loadVideosFromSearch(0, searchField.value);
 
             }
             event.preventDefault && event.preventDefault();

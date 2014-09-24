@@ -14,6 +14,12 @@
         <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
 </video>
 
+<style>
+    body {
+        margin: 0 auto;
+    }
+</style>
+
 
 <script language="JavaScript">
     var parser = document.createElement('a');
@@ -26,7 +32,7 @@
     }
 
     (function () {
-        var vd = new Videe(document.getElementById('video-player'), getTokenFromUrl(), 'wp.dev');//parser.hostname);
+        var vd = new Videe(document.getElementById('video-player'), getTokenFromUrl(), parser.hostname);
         vd.initWidget();
     })();
 </script>
